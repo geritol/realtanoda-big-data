@@ -1,4 +1,43 @@
+import os
 from csv_reader import readCSV
+
+class Towers():
+    def __init__(self):
+        self.towers = []
+    def init (self, data, force = False):
+        csv_exist = os.path.isfile('towers.csv')
+        if force or not csv_exist:
+            for i in data:
+                self.add(i.latitude, i.longitude)
+            return
+        self.towers = readCSV('towers.csv', Tower, False)
+        
+    def add(self, lat, lng):
+        id = len(self.towers)
+        if id == 0: 
+            self.towers.append(Tower(id, lat, lng))
+            return True
+            
+        found = False
+        for t in self.towers:
+            if t.isMe(lat, lng):
+                found = True
+                break
+        if not found: 
+            self.towers.append(Tower(id, lat, lng))
+    def num(self):
+        print(len(self.towers))
+    def save(self):
+        file_name = 'towers.csv'
+        if os.path.isfile(file_name): os.remove(file_name)
+            
+        with open(file_name, "w", encoding='utf8') as f:
+            for i in range(len(self.towers)):
+                tower = self.towers[i]
+                if i == 0: f.write('id; lat; lng \n')
+                f.write(tower.csv())
+                
+
 
 class Tower():
     def __init__(self, id, lat, lng):
@@ -15,6 +54,10 @@ class Tower():
         self.connected += 1
     def dissconnect(self):
         self.connected -= 1
+    def __str__(self):
+        return 'id: ' + str(self.id) + ' lat: ' + self.lat + ' lng: ' + self.lng
+    def csv(self):
+        return str(self.id) + ';' + str(self.lat) + ';' + str(self.lng) +  '\n'
 
 class BaseData():
     def __init__(self, keys, data):
@@ -34,10 +77,8 @@ class MSC(BaseData):
         )
 
 
-msc_data = readCSV('data/msc_weekly.csv', MSC)
+data = readCSV('data/msc_weekly.csv', MSC)
 
-for i in msc_data:
-    print(i)
 # towers = []
 
 # tower id counter
@@ -55,6 +96,11 @@ for i in msc_data:
 #     else:
 #         towers.append(Tower(id, tower_data.latitude, tower_data.longitude))
 
+towers = Towers()
+towers.init(data)
 
-# for k in towers:
-#     print(k)
+print(towers.towers[2040])
+towers.num()
+
+towers.save()
+
