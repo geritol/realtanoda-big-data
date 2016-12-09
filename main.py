@@ -48,11 +48,9 @@ class Towers():
         print(self.towers[0])
         for tower in self.towers:
             coords = tower.getCoords()
-            print( 'x ' + coords[0])
-            print( 'y' + coords[1])
-            print(tower)
-            xs.append(float(coords[0].strip()))
-            ys.append(float(coords[1].strip()))
+
+            xs.append(coords[0])
+            ys.append(coords[1])
             
         plt.plot(xs, ys, '.')
                 
@@ -68,7 +66,7 @@ class Tower():
         self.connected = 0
         self.range = 35
     def isMe(self, lat, lng):
-        if self.lat == lat and self.lng == lng:
+        if self.lat == float(lat) and self.lng == float(lng):
             return True
         return False
     def getRange(self):
@@ -80,7 +78,7 @@ class Tower():
     def dissconnect(self):
         self.connected -= 1
     def __str__(self):
-        return 'id: ' + str(self.id) + ' lat: ' + self.lat + ' lng: ' + self.lng
+        return 'id: ' + str(self.id) + ' lat: ' + str(self.lat) + ' lng: ' + str(self.lng)
     def csv(self):
         return str(self.id) + ';' + str(self.lat) + ';' + str(self.lng) +  '\n'
 
