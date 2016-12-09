@@ -72,5 +72,6 @@ for i in range(1000):
 
 plt.plot(xs, ys, '.')
 circle = plt.Circle((tower_x, tower_y), r, color='r', fill=False)
-
+fig = plt.gcf()
+fig.gca().add_artist(circle)
 plt.show()
