@@ -8,7 +8,7 @@ class Tower():
         self.connected = 0
         self.range = 35
     def isMe(self, lat, lng):
-        if slf.lat == lat and self.lng == lng:
+        if self.lat == lat and self.lng == lng:
             return True
         return False
     def connect(self):
@@ -33,9 +33,27 @@ class MSC(BaseData):
             self.dataset, self.subscriber, self.TAC, self.type, self.timestamp, self.unix, self.latitude, self.longitude
         )
 
-        
 
-x = readCSV('data/msc_weekly.csv', MSC)
-for i in x:
-    print(i.latitude, i.longitude)
+msc_data = readCSV('data/msc_weekly.csv', MSC)
 
+towers = []
+
+# tower id counter
+id = 0
+for tower_data in msc_data:
+    if towers:
+        found = False
+        for tower in towers:
+            if tower.isMe(tower_data.latitude, tower_data.longitude):
+                found = True
+                break
+        if not found:
+            towers.append(Tower(id, tower_data.latitude, tower_data.longitude))
+            id += 1
+    else:
+        towers.append(Tower(id, tower_data.latitude, tower_data.longitude))
+
+
+# for k in towers:
+#     print(k)
+print(len(towers))
