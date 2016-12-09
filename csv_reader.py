@@ -1,7 +1,7 @@
 import csv
 
 
-def readCSV(file, className):
+def readCSV(file, className, bulk = True):
     
     with open(file, "rt", encoding='utf8') as f:
         header = []
@@ -11,7 +11,10 @@ def readCSV(file, className):
             if(len(header) == 0):
                 header = row[0].split(';')
             else:
-                c = className(header, row[0].split(';'))
+                if bulk: 
+                    c = className(header, row[0].split(';'))
+                else: 
+                    c = className(*row[0].split(';'))
                 out.append(c)
     return out
 
