@@ -3,6 +3,7 @@ import pylab as plt
 
 from csv_reader import readCSV
 from gen_random_pos import randomCoords
+from approximate_tower_ranges import gen
 
 class Towers():
     def __init__(self):
@@ -51,8 +52,9 @@ class Towers():
 
             xs.append(coords[0])
             ys.append(coords[1])
-            
-        plt.plot(xs, ys, '.')
+       
+        gen(5000)
+        plt.plot(ys, xs, '.')
                 
 
 
