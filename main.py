@@ -7,6 +7,10 @@ class Tower():
         self.lng = lng
         self.connected = 0
         self.range = 35
+    def isMe(self, lat, lng):
+        if slf.lat == lat and self.lng == lng:
+            return True
+        return False
     def connect(self):
         self.connected += 1
     def dissconnect(self):
