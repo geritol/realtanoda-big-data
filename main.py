@@ -1,4 +1,35 @@
+import os
 from csv_reader import readCSV
+
+class Towers():
+    def __init__(self):
+        self.towers = []
+    def add(self, lat, lng):
+        id = len(self.towers)
+        if id == 0: 
+            self.towers.append(Tower(id, lat, lng))
+            return True
+            
+        found = False
+        for t in self.towers:
+            if t.isMe(lat, lng):
+                found = True
+                break
+        if not found: 
+            self.towers.append(Tower(id, lat, lng))
+    def num(self):
+        print(len(self.towers))
+    def save(self):
+        file_name = 'Towers ' + str(len(self.towers)) + '.csv'
+        if os.path.isfile(file_name): os.remove(file_name)
+            
+        with open(file_name, "w", encoding='utf8') as f:
+            for i in range(len(self.towers)):
+                tower = self.towers[i]
+                if i == 0: f.write('id, lat, lng \n')
+                f.write(tower.csv())
+                
+
 
 class Tower():
     def __init__(self, id, lat, lng):
@@ -15,6 +46,10 @@ class Tower():
         self.connected += 1
     def dissconnect(self):
         self.connected -= 1
+    def __str__(self):
+        return 'id: ' + str(self.id) + ' lat: ' + self.lat + ' lng: ' + self.lng
+    def csv(self):
+        return str(self.id) + ',' + str(self.lat) + ',' + str(self.lng) +  '\n'
 
 class BaseData():
     def __init__(self, keys, data):
@@ -34,26 +69,16 @@ class MSC(BaseData):
         )
 
 
-msc_data = readCSV('data/msc_weekly.csv', MSC)
+data = readCSV('data/msc_weekly.csv', MSC)
 
-towers = []
+towers = Towers()
 
-# tower id counter
-id = 0
-for tower_data in msc_data:
-    if towers:
-        found = False
-        for tower in towers:
-            if tower.isMe(tower_data.latitude, tower_data.longitude):
-                found = True
-                break
-        if not found:
-            towers.append(Tower(id, tower_data.latitude, tower_data.longitude))
-            id += 1
-    else:
-        towers.append(Tower(id, tower_data.latitude, tower_data.longitude))
+for i in data:
+    towers.add(i.latitude, i.longitude)
 
+print(towers.towers[2040])
+towers.num()
 
-# for k in towers:
-#     print(k)
-print(len(towers))
+towers.save()
+    
+
