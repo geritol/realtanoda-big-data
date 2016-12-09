@@ -36,24 +36,25 @@ class MSC(BaseData):
 
 msc_data = readCSV('data/msc_weekly.csv', MSC)
 
-towers = []
+for i in msc_data:
+    print(i)
+# towers = []
 
 # tower id counter
-id = 0
-for tower_data in msc_data:
-    if towers:
-        found = False
-        for tower in towers:
-            if tower.isMe(tower_data.latitude, tower_data.longitude):
-                found = True
-                break
-        if not found:
-            towers.append(Tower(id, tower_data.latitude, tower_data.longitude))
-            id += 1
-    else:
-        towers.append(Tower(id, tower_data.latitude, tower_data.longitude))
+# id = 0
+# for tower_data in msc_data:
+#     if towers:
+#         found = False
+#         for tower in towers:
+#             if tower.isMe(tower_data.latitude, tower_data.longitude):
+#                 found = True
+#                 break
+#         if not found:
+#             towers.append(Tower(id, tower_data.latitude, tower_data.longitude))
+#             id += 1
+#     else:
+#         towers.append(Tower(id, tower_data.latitude, tower_data.longitude))
 
 
 # for k in towers:
 #     print(k)
-print(len(towers))
