@@ -6,8 +6,8 @@ pi = math.pi
 #
 # tower_x = 46.971740
 # tower_y = 21.087803
-tower_x = 5
-tower_y = 5
+tower_x = 47.513853
+tower_y = 19.0542355
 r = 35/111.3
 
 
@@ -71,6 +71,6 @@ for i in range(1000):
 	ys.append(coord[1])
 
 plt.plot(xs, ys, '.')
-circle = plt.Circle((5, 5), r, color='r', fill=False)
-plt.axis([0, 10, 0, 10])
+circle = plt.Circle((tower_x, tower_y), r, color='r', fill=False)
+
 plt.show()
