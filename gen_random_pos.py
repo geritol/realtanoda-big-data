@@ -1,5 +1,6 @@
 import math
 import random
+import numpy as np
 import pylab as plt
 
 pi = math.pi
@@ -62,16 +63,11 @@ def randomCoords(r, x0, y0):
 
 	return [_x + x0, y + y0]
 
-xs = []
-ys = []
-
-for i in range(1000):
-	coord = randomCoords(r, tower_x, tower_y)
-	xs.append(coord[0])
-	ys.append(coord[1])
-
-plt.plot(xs, ys, '.')
-circle = plt.Circle((tower_x, tower_y), r, color='r', fill=False)
-fig = plt.gcf()
-fig.gca().add_artist(circle)
-plt.show()
+# xs = []
+# ys = []
+#
+# for i in range(1000):
+# 	coord = randomCoords(r, tower_x, tower_y)
+# 	xs.append(coord[0])
+# 	ys.append(coord[1])
+#

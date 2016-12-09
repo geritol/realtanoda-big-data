@@ -52,9 +52,8 @@ class Towers():
             xs.append(coords[0])
             ys.append(coords[1])
             
-        plt.plot(xs, ys, '.')
-                
-
+        plt.plot(ys,xs, '.')
+        plt.show()
 
 class Tower():
     def __init__(self, id, lat, lng):
@@ -128,6 +127,7 @@ towers.init(data)
 print(towers.towers[2040])
 towers.num()
 towers.draw()
+
 
 towers.save()
 
