@@ -3,6 +3,7 @@ import pylab as plt
 import math
 import csv
 import time
+import random
 
 
 from csv_reader import readCSV
@@ -14,7 +15,8 @@ class Towers():
         self.towers = []
         self.map = {}
         self.connectedStats = []
-    def init (self, data, force = False):
+
+    def init(self, data, force = False):
         csv_exist = os.path.isfile('towers.csv')
         if force or not csv_exist:
             for i in data:
@@ -69,15 +71,16 @@ class Towers():
         plt.show()
     def getConnected(self):
         res = []
-        for tower in towers:
+        for tower in self.towers:
             res.append(tower.connected)
-        self.connectedStats.apend(res)
+        self.connectedStats.append(res)
+
     def simulate(self):
         self.time = 0
         header = []
         with open('data/msc_100k_sorted.csv', "rt", encoding='utf8') as f:
             reader = csv.reader(f)
-            
+
             for line in reader:
                 if header:
                     
@@ -87,15 +90,22 @@ class Towers():
                         self.time = int(data[3])
                     if self.time == data[3]:
                         key = str(data[4]) + str(data[5])
-         
+
                         towerID =  self.find(key)
                         tower = self.towers[towerID]
                         #connect to tower for 2 mins
+
+                        # call object: start_time, call_lenght, position
+                        current_call = Call(int(data[3]), random.randint(1, 600), tower.getCoords())
+                        tower.addCall(current_call)
                         tower.connect(2)
+                        print("connected: {}, call list len: {}".format(tower.connected, len(tower.calls)))
+                        break
                     else:
                         self.time += 1
                 else:
                     header = line[0].split(';')
+                    break
 
 class Tower():
     def __init__(self, id, lat, lng, bounds = [], distances = []):
@@ -106,7 +116,10 @@ class Tower():
         self.range = 35
         self.bounds = bounds
         self.distances = distances
+        self.calls = []
 
+    def addCall(self, call):
+        self.calls.append(call)
 
     def isMe(self, lat, lng):
         if self.lat == float(lat) and self.lng == float(lng):
@@ -161,12 +174,21 @@ class Customer():
         self.calls.append(Call(time, position, tower))
 
 class Call():
-    def __init__(self, time, position, tower):
-        self.time = time
-        self.tower = tower
+    def __init__(self, start_time, call_lenght, position):
+        self.start_time = start_time
+        self.call_length = call_lenght
         self.position = position
+        self.end_time = start_time + call_lenght
+
+    def isInCall(self, time):
+        if time in list(range(self.start_time + self.call_length)):
+            return True
+        return False
+
+
+
     def __srt__(self):
-        return 'Positon: ' + str(position) + ' Time: ' + str(time) + ' Tower: ' + str(tower)
+        return 'Positon: ' + str(self.position) + ' Time: ' + str(self.start_time) + ' Lenght: ' + str(self.call_length)
 
 class BaseData():
     def __init__(self, keys, data):
@@ -195,6 +217,7 @@ print(towers.towers[2040].getDistance(47.603111, 19.060024))
 print(towers.towers[2040].getDistance(towers.towers[2040].lat, towers.towers[2040].lng))
 towers.num()
 towers.simulate()
+print(towers.connectedStats)
 #towers.draw()
 
 #
