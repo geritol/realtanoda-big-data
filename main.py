@@ -2,7 +2,7 @@ import os
 import pylab as plt
 import math
 import csv
-import time
+from multiprocessing.pool import ThreadPool
 
 
 from csv_reader import readCSV
@@ -14,7 +14,7 @@ class Towers():
         self.towers = []
         self.map = {}
         self.connectedStats = []
-    def init (self, data, force = False):
+    def init (self, data, force = True):
         csv_exist = os.path.isfile('towers.csv')
         if force or not csv_exist:
             for i in data:
@@ -36,6 +36,7 @@ class Towers():
         if not found:
             self.towers.append(Tower(id, lat, lng))
             self.map[str(lat)+str(lng)] = id
+            
     def find(self,latlngstr):
         try:
             return self.map[latlngstr]
@@ -69,9 +70,11 @@ class Towers():
         plt.show()
     def getConnected(self):
         res = []
-        for tower in towers:
-            res.append(tower.connected)
-        self.connectedStats.apend(res)
+        for tower in self.towers:
+
+            res.append(tower.getConnectedNum())
+        return res
+        
     def simulate(self):
         self.time = 0
         header = []
@@ -79,23 +82,43 @@ class Towers():
             reader = csv.reader(f)
             
             for line in reader:
-                if header:
-                    
-                    data = line[0].split(';')
+
+                
+                while True:
      
-                    if self.time == 0:
-                        self.time = int(data[3])
-                    if self.time == data[3]:
-                        key = str(data[4]) + str(data[5])
+                    if header:
+                        
+                        data = line[0].split(';')
          
-                        towerID =  self.find(key)
-                        tower = self.towers[towerID]
-                        #connect to tower for 2 mins
-                        tower.connect(2)
+                        if self.time == 0:
+           
+                            self.time = int(data[3])
+                            self.startTime = int(data[3])
+                            
+                        if self.time == int(data[3]):
+                            key = str(data[4]) + str(data[5])
+                            #print(key)
+                            towerID =  self.find(key)
+                            #print(towerID)
+                            
+                            tower = self.towers[towerID]
+                            #print(tower)
+                            #connect to tower for 2 mins
+                            tower.connect(2)
+                            break
+                        else:
+                            self.addvanceTime()
                     else:
-                        self.time += 1
-                else:
-                    header = line[0].split(';')
+                        header = line[0].split(';')
+                        break
+    def addvanceTime(self):
+        self.time += 1
+        if (self.time - self.startTime) % 3600 == 0:
+            self.connectedStats.append(self.getConnected())
+#            print('added hour')
+#            print(self.getConnected())
+#            print()
+   
 
 class Tower():
     def __init__(self, id, lat, lng, bounds = [], distances = []):
@@ -132,14 +155,16 @@ class Tower():
         self.bounds.append(bound)
         self.distances.append(self.getDistance(*bound))
 
+    def getConnectedNum(self):
+        return self.connected
     def connect(self, mins):
         self.connected += 1
-        #mins
-        time.sleep(mins)
-        self.dissconnect()
+        
 
     def dissconnect(self):
         self.connected -= 1
+        return
+        
 
     def __str__(self):
         return 'id: ' + str(self.id) + ' lat: ' + str(self.lat) + ' lng: ' + str(self.lng)
@@ -193,6 +218,19 @@ towers.init(data)
 print(towers.towers[2040].getDistance(towers.towers[2040].lat, towers.towers[2040].lng))
 towers.num()
 towers.simulate()
+#print(towers.connectedStats)
+res = []
+
+stats = towers.connectedStats
+for i in stats:
+    res.append(sum(i))
+print( len(res))
+plt.plot(range(23), res)
+c = 0
+for i in stats[22]:
+    if i == 0:
+        c+= 1
+print(c)
 #towers.draw()
 
 #
