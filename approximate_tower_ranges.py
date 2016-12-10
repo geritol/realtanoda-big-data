@@ -1,6 +1,7 @@
 '''
 source: http://gis.stackexchange.com/questions/6412/generate-points-that-lie-inside-polygon
 '''
+import os
 
 import random
 import pylab as plt
@@ -21,6 +22,39 @@ orszag = Polygon([(17.1855, 47.9883), (16.5222, 47.7057), (16.5081, 47.3867), (1
                     (18.7661, 47.8698), (17.8629, 47.724)])
                     
 
+def percent(resz, egesz):
+    if(resz/egesz == 0.1):
+        return 10
+    if(resz/egesz == 0.2):
+        return 20
+    if(resz/egesz == 0.3):
+        return 30
+    if(resz/egesz == 0.4):
+        return 40
+    if(resz/egesz == 0.5):
+        return 50
+    if(resz/egesz == 0.6):
+        return 60
+    if(resz/egesz == 0.7):
+        return 70
+    if(resz/egesz == 0.8):
+        return 80
+    if(resz/egesz == 0.9):
+        return 90
+        
+def save(num):
+    file_name = 'random.csv'
+    if os.path.isfile(file_name): os.remove(file_name)
+        
+    with open(file_name, "w", encoding='utf8') as f:
+        for i in range(num):
+            if i == 0: f.write('x; y \n')
+            point = get_random_point_in_polygon(orszag)
+            f.write(str(point.x) + ';'+str(point.y)+'\n')
+            if percent(i, num):
+                print(percent(i, num))
+            
+save(10000000)
 
 def gen(num):
     
@@ -31,5 +65,7 @@ def gen(num):
         point = get_random_point_in_polygon(orszag)
         xs.append(point.x)
         ys.append(point.y)
+        if percent(i, num):
+            print(percent(i, num))
         
     plt.plot(xs, ys, '.')

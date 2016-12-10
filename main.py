@@ -54,7 +54,7 @@ class Towers():
             ys.append(coords[1])
 
        
-        gen(5000)
+        gen(500)
         plt.plot(ys, xs, '.')
         plt.show()
 
