@@ -1,14 +1,19 @@
 import os
 import pylab as plt
 import math
+import csv
+import time
+
 
 from csv_reader import readCSV
 from gen_random_pos import randomCoords
-# from approximate_tower_ranges import gen
+#from approximate_tower_ranges import gen
 
 class Towers():
     def __init__(self):
         self.towers = []
+        self.map = {}
+        self.connectedStats = []
     def init (self, data, force = False):
         csv_exist = os.path.isfile('towers.csv')
         if force or not csv_exist:
@@ -23,15 +28,19 @@ class Towers():
             return
         if id == 0: 
             self.towers.append(Tower(id, lat, lng))
+            self.map[str(lat)+str(lng)] = id
             return True
             
-        found = False
-        for t in self.towers:
-            if t.isMe(lat, lng):
-                found = True
-                break
+        found = self.find(str(lat)+str(lng))
+
         if not found:
             self.towers.append(Tower(id, lat, lng))
+            self.map[str(lat)+str(lng)] = id
+    def find(self,latlngstr):
+        try:
+            return self.map[latlngstr]
+        except KeyError:
+            return False
     def num(self):
         print(len(self.towers))
     def save(self):
@@ -41,7 +50,7 @@ class Towers():
         with open(file_name, "w", encoding='utf8') as f:
             for i in range(len(self.towers)):
                 tower = self.towers[i]
-                if i == 0: f.write('id; lat; lng \n')
+                if i == 0: f.write('id; lat; lng; bounds; distances \n')
                 f.write(tower.csv())
     def draw(self):
         xs = []
@@ -58,14 +67,45 @@ class Towers():
         gen(500)
         plt.plot(ys, xs, '.')
         plt.show()
+    def getConnected(self):
+        res = []
+        for tower in towers:
+            res.append(tower.connected)
+        self.connectedStats.apend(res)
+    def simulate(self):
+        self.time = 0
+        header = []
+        with open('data/msc_100k_sorted.csv', "rt", encoding='utf8') as f:
+            reader = csv.reader(f)
+            
+            for line in reader:
+                if header:
+                    
+                    data = line[0].split(';')
+     
+                    if self.time == 0:
+                        self.time = int(data[3])
+                    if self.time == data[3]:
+                        key = str(data[4]) + str(data[5])
+         
+                        towerID =  self.find(key)
+                        tower = self.towers[towerID]
+                        #connect to tower for 2 mins
+                        tower.connect(2)
+                    else:
+                        self.time += 1
+                else:
+                    header = line[0].split(';')
 
 class Tower():
-    def __init__(self, id, lat, lng):
+    def __init__(self, id, lat, lng, bounds = [], distances = []):
         self.id = id
         self.lat = float(lat)
         self.lng = float(lng)
         self.connected = 0
         self.range = 35
+        self.bounds = bounds
+        self.distances = distances
 
 
     def isMe(self, lat, lng):
@@ -79,8 +119,8 @@ class Tower():
     def getCoords(self):
         return [self.lat, self.lng]
 
-    def getDistance(self, lat2, lng2):
-        lon1, lat1, lon2, lat2 = map(math.radians, [self.lng, self.lat, lng2, lat2])
+    def getDistance(self, lng2, latt2):
+        lon1, lat1, lon2, lat2 = map(math.radians, [self.lng, self.lat, float(lng2), float(latt2)])
         # haversine formula
         dlon = lon2 - lon1
         dlat = lat2 - lat1
@@ -88,9 +128,16 @@ class Tower():
         c = 2 * math.asin(math.sqrt(a))
         km = 6367 * c
         return km
+    
+    def addBound(self, bound):
+        self.bounds.append(bound)
+        self.distances.append(self.getDistance(*bound))
 
-    def connect(self):
+    def connect(self, mins):
         self.connected += 1
+        #mins
+        time.sleep(mins)
+        self.dissconnect()
 
     def dissconnect(self):
         self.connected -= 1
@@ -99,7 +146,7 @@ class Tower():
         return 'id: ' + str(self.id) + ' lat: ' + str(self.lat) + ' lng: ' + str(self.lng)
 
     def csv(self):
-        return str(self.id) + ';' + str(self.lat) + ';' + str(self.lng) +  '\n'
+        return str(self.id) + ';' + str(self.lat) + ';' + str(self.lng) + ';' + str(self.bounds) + ';' + str(self.distances) + '\n'
 
 class Customer():
     def __init__(self, id):
@@ -145,9 +192,43 @@ towers = Towers()
 towers.init(data)
 
 print(towers.towers[2040].getDistance(47.603111, 19.060024))
+print(towers.towers[2040].getDistance(towers.towers[2040].lat, towers.towers[2040].lng))
 towers.num()
-towers.draw()
+towers.simulate()
+#towers.draw()
 
+#
+#with open('random_felmill_.csv', "rt", encoding='utf8') as f:
+#    
+#   
+#    reader = csv.reader(f)
+#        
+#        
+#
+#    for line in reader:
+#        distance = 2000
+#        cordinates = [] 
+#        t = None
+#        for tower in towers.towers:
+#
+#            
+#            #print(len(line[0].split(';')))
+#            if(len(line[0].split(';')) == 2):
+#                cords = line[0].split(';')
+#                #print(cords)
+#                dist = tower.getDistance(*cords)
+#                #print(dist)
+#                if dist < distance:
+#                    #print(cords)
+#                    distance = dist
+#                    cordinates = cords
+#                    t = tower
+#
+#        if cordinates:
+#            t.addBound(cordinates)
+#            #print(t.bounds)
+#            #print(t.id)
+                
 
 towers.save()
 
