@@ -18,3 +18,6 @@ def readCSV(file, className, bulk = True):
                 out.append(c)
     return out
 
+
+
+

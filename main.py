@@ -4,7 +4,7 @@ import math
 
 from csv_reader import readCSV
 from gen_random_pos import randomCoords
-from approximate_tower_ranges import gen
+# from approximate_tower_ranges import gen
 
 class Towers():
     def __init__(self):
@@ -66,6 +66,7 @@ class Tower():
         self.lng = float(lng)
         self.connected = 0
         self.range = 35
+
 
     def isMe(self, lat, lng):
         if self.lat == float(lat) and self.lng == float(lng):
@@ -143,7 +144,7 @@ data = readCSV('data/msc_weekly.csv', MSC)
 towers = Towers()
 towers.init(data)
 
-print(towers.towers[2040])
+print(towers.towers[2040].getDistance(47.603111, 19.060024))
 towers.num()
 towers.draw()
 
