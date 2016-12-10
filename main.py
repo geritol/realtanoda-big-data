@@ -1,5 +1,6 @@
 import os
 import pylab as plt
+import math
 
 from csv_reader import readCSV
 from gen_random_pos import randomCoords
@@ -60,27 +61,42 @@ class Towers():
 
 class Tower():
     def __init__(self, id, lat, lng):
-     
-            
         self.id = id
         self.lat = float(lat)
         self.lng = float(lng)
         self.connected = 0
         self.range = 35
+
     def isMe(self, lat, lng):
         if self.lat == float(lat) and self.lng == float(lng):
             return True
         return False
+
     def getRange(self):
         return self.range
+
     def getCoords(self):
         return [self.lat, self.lng]
+
+    def getDistance(self, lat2, lng2):
+        lon1, lat1, lon2, lat2 = map(math.radians, [self.lng, self.lat, lng2, lat2])
+        # haversine formula
+        dlon = lon2 - lon1
+        dlat = lat2 - lat1
+        a = math.sin(dlat / 2) ** 2 + math.cos(lat1) * math.cos(lat2) * math.sin(dlon / 2) ** 2
+        c = 2 * math.asin(math.sqrt(a))
+        km = 6367 * c
+        return km
+
     def connect(self):
         self.connected += 1
+
     def dissconnect(self):
         self.connected -= 1
+
     def __str__(self):
         return 'id: ' + str(self.id) + ' lat: ' + str(self.lat) + ' lng: ' + str(self.lng)
+
     def csv(self):
         return str(self.id) + ';' + str(self.lat) + ';' + str(self.lng) +  '\n'
 
